@@ -3,9 +3,10 @@ import rclpy.executors
 import rclpy.node
 import cv2
 import numpy as np
-import stopper
 
-from two_drive.stopper import Stopper
+from stopper import Stopper
+from std_msgs.msg import String
+from sensor_msgs.msg import LaserScan
 from geometry_msgs.msg import Twist
 from enum import Enum
 
@@ -89,12 +90,11 @@ def main(args=None):
         rclpy.spin(driver_node)
 
     except KeyboardInterrupt:
-        stop = stopper()
+        stop = Stopper()
 
     finally:
-        stop = stopper()
         driver_node.destroy_node()
-        stopper().destroy_node()
+        stop.destroy_node()
         rclpy.shutdown()
         print('Shutting Down NodeMaster')
         print('Shutting Down NodeMaster')

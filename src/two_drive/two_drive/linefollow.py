@@ -3,8 +3,8 @@ import rclpy.executors
 import rclpy.node
 import cv2
 import numpy as np
-import stopper
 
+from stopper import Stopper
 from geometry_msgs.msg import Twist
 from sensor_msgs.msg import CompressedImage
 from cv_bridge import CvBridge, CvBridgeError
@@ -200,12 +200,11 @@ def main(args=None):
         rclpy.spin(node)
         
     except KeyboardInterrupt:
-        stop = stopper()
+        stop = Stopper()
 
     finally:
-        stop = stopper()
         LineFollow.destroy_node()
-        stopper().destroy_node()
+        stop.destroy_node()
         rclpy.shutdown()
         print('Shutting Down LineFollow')
 

@@ -3,8 +3,8 @@ import rclpy.executors
 import rclpy.node
 import cv2
 import numpy as np
-import stopper
 
+from stopper import Stopper
 from std_msgs.msg import String
 from sensor_msgs.msg import LaserScan
 from geometry_msgs.msg import Twist
@@ -82,11 +82,10 @@ def main(args=None):
         rclpy.spin(node)
         
     except KeyboardInterrupt:
-        stop = stopper()
+        stop = Stopper()
 
     finally:
-        stop = stopper()
         LaserTurn.destroy_node()
-        stopper().destroy_node()
+        stop.destroy_node()
         rclpy.shutdown()
         print('Shutting Down LaserTurn')
