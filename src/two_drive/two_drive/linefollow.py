@@ -3,6 +3,7 @@ import rclpy.executors
 import rclpy.node
 import cv2
 import numpy as np
+import stopper
 
 from geometry_msgs.msg import Twist
 from sensor_msgs.msg import CompressedImage
@@ -24,16 +25,19 @@ class LineFollow(rclpy.node.Node):
         self.declare_parameter('speed_turn_adjust',0.3)
         self.lineposition = 0
 
+
         # init openCV-bridge
         self.bridge = CvBridge()
 
+
         #self.img_row = np.array([0, 64, 128, 192, 255], dtype=np.uint8) # Beispiel
-        self.img_row = np.random.randint(0, 256, 640, dtype=np.uint8)
+        self.img_row = np.array([0],dtype=np.uint8)
 
         # definition of the QoS in order to receive data despite WiFi
         qos_policy = rclpy.qos.QoSProfile(reliability=rclpy.qos.ReliabilityPolicy.BEST_EFFORT,
                                           history=rclpy.qos.HistoryPolicy.KEEP_LAST,
                                           depth=1)
+        
         
         self.last_spin = False # False == gegen UHrzeigersinn True==mit Uhrzeigersinn
         # create subscribers for image data with changed qos
@@ -46,9 +50,11 @@ class LineFollow(rclpy.node.Node):
 
         # create publisher for driving commands
         self.publisher_linefollow = self.create_publisher(Twist, 'line', 1)
+        self.publisher_linefollow = self.create_publisher(Twist, 'line', 1)
 
         # create timer to periodically invoke the driving logic
         self.timer_period = 0.2  # seconds
+        self.my_timer = self.create_timer(self.timer_period, self.timer_callback)
         self.my_timer = self.create_timer(self.timer_period, self.timer_callback)
     
     # handling received image data
@@ -66,6 +72,7 @@ class LineFollow(rclpy.node.Node):
         img_row = img_gray[height-1,:]
         self.img_row = img_row 
 
+
         # show image
         cv2.imshow("IMG", img_gray)
         cv2.imshow("IMG_ROW", img_row)
@@ -74,7 +81,7 @@ class LineFollow(rclpy.node.Node):
 
     # driving logic for linefollowing
     def timer_callback(self):
-        #self.get_logger().info("FollowerLogic")
+        self.get_logger().info("FollowerLogik")
         
         boundary_left = self.get_parameter('boundary_left').get_parameter_value().integer_value
         boundary_right = self.get_parameter('boundary_right').get_parameter_value().integer_value
@@ -92,10 +99,16 @@ class LineFollow(rclpy.node.Node):
 
         # Werte der 20 größten Elemente
         largest_values = img_row[img_row_sorted]
+        # Werte der 20 größten Elemente
+        largest_values = img_row[img_row_sorted]
 
         # Index des mittleren Wertes der 20 größten im Teil-Array
         middle_index_in_subset = np.argsort(largest_values)[len(largest_values) // 2]
+        # Index des mittleren Wertes der 20 größten im Teil-Array
+        middle_index_in_subset = np.argsort(largest_values)[len(largest_values) // 2]
 
+        # Index des mittleren Wertes im Original-Array
+        middle_index_in_original = img_row_sorted[middle_index_in_subset]
         # Index des mittleren Wertes im Original-Array
         middle_index_in_original = img_row_sorted[middle_index_in_subset]
 
@@ -109,13 +122,45 @@ class LineFollow(rclpy.node.Node):
         brightest = max(img_row)
         #bright_pos = np.where(img_row == closest_value)[0][0]
         line_pos = middle_index_in_original + boundary_left
+        max_avg = np.mean(img_row_sorted)
+        #closest_index = img_row[np.argmin(np.abs(img_row_sorted - max_avg))]
+        #closest_index = np.argmin(np.abs(np.arange(len(img_row)) - max_avg))
+        closest_value = img_row[middle_index_in_original]
+        middle_pix = 320
+        speed = 0.0
+        turn = 0.0
+        brightest = max(img_row)
+        #bright_pos = np.where(img_row == closest_value)[0][0]
+        line_pos = middle_index_in_original + boundary_left
 
-        #self.get_logger().info(f"Hellster Wert: {brightest}")
-        #self.get_logger().info(f"Durchschnittlich hellster Wert: {closest_value}")
+        self.get_logger().info(f"Hellster Wert: {brightest}")
+        self.get_logger().info(f"Durchschnittlich hellster Wert: {closest_value}")
         #self.get_logger().info(f"Durchschnittlich hellster Index: {closest_index}")
-        #self.get_logger().info(f"Mittlerer Index der hellsten Pixel: {middle_index_in_original})")
-        #print(img_row)
+        self.get_logger().info(f"Mittlerer Index der hellsten Pixel: {middle_index_in_original})")
+        print(img_row)
 
+        if(brightest < light_lim  and last_spin == False):        
+            #no white in bottom line of image 
+            speed= 0.0
+            turn = speed_turn
+        elif(brightest < light_lim and last_spin == True):
+            speed= 0.0
+            turn = -speed_turn
+        else:
+            speed=speed_drive
+            #white pixel in image line / and bright_pos > boundary_left)
+            if line_pos < (middle_pix) :
+                #left side is brightest: turn left '-'
+                turn = speed_turn
+                self.last_spin = True
+            # and bright_pos < boundary_right)
+            elif line_pos > (middle_pix) :
+                # right side right turn '+'
+                turn = -speed_turn
+                self.last_spin = False
+            else :
+                    # bright pixel is in the middle 
+                    turn = 0.0
         if(brightest < light_lim  and last_spin == False):        
             #no white in bottom line of image 
             speed= 0.0
@@ -146,6 +191,23 @@ class LineFollow(rclpy.node.Node):
 
             # send message
             self.publisher_linefollow.publish(msg)
+
+def main(args=None):
+    rclpy.init(args=args)
+    node = LineFollow()
+
+    try:
+        rclpy.spin(node)
+        
+    except KeyboardInterrupt:
+        stop = stopper()
+
+    finally:
+        stop = stopper()
+        LineFollow.destroy_node()
+        stopper().destroy_node()
+        rclpy.shutdown()
+        print('Shutting Down LineFollow')
 
 def main(args=None):
     rclpy.init(args=args)

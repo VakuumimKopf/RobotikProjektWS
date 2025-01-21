@@ -1,6 +1,9 @@
 import rclpy
 import rclpy.executors
 import rclpy.node
+import cv2
+import numpy as np
+import stopper
 
 from two_drive.stopper import Stopper
 from geometry_msgs.msg import Twist
@@ -58,12 +61,21 @@ class Driver(rclpy.node.Node):
             self.get_logger().info("using LaserMsg")
             msg = self.laser_msg
         else:
-            self.get_logger().info('Error State entered in Driving Logic')
-            msg = Twist()
-            msg.linear.x = 0.0
-            msg.angular.z = 0.0
+            if not self.node_follow.active:
+                self.get_logger().info(f"Activating LineFollow (distance: {self.front_distance})")
+                self.node_turn.deactivate()
+                self.node_follow.activate()
+        #self.front_distance -= 1 
+        #print(self.front_distance)
 
-        self.publisher_.publish(msg)
+        ''' if(front_dist < turn_dist and front_dist!=0 and self.current_state == 'NODE_Follow'):
+            node_follow.destroy_node()
+            self.get_logger().info('Switching to NODE_Turn.')
+            self.activate_node_turn()
+        else: #elif front_dist >= turn_dist and self.current_state == 'NODE_Turn':
+            node_turn.destroy_node()
+            self.get_logger().info('Switching to NODE_Follow.')
+            self.activate_node_follow() '''
 
 def main(args=None):
 
@@ -74,14 +86,17 @@ def main(args=None):
     try:
         rclpy.spin(driver_node)
 
+        rclpy.spin(driver_node)
+
     except KeyboardInterrupt:
-        driver_node.destroy_node()
-        stop = Stopper()
+        stop = stopper()
 
     finally:
+        stop = stopper()
         driver_node.destroy_node()
-        stop.destroy_node()
+        stopper().destroy_node()
         rclpy.shutdown()
+        print('Shutting Down NodeMaster')
         print('Shutting Down NodeMaster')
 
 
