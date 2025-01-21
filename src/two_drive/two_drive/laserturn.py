@@ -19,7 +19,11 @@ class LaserTurn(rclpy.node.Node):
         self.declare_parameter('speed_drive', 0.15)
         self.declare_parameter('speed_turn', 0.5)
         self.declare_parameter('laser_front', 0)
+<<<<<<< HEAD
         self.declare_parameter('turn_time', 2) # must ideally equal to an integer when divided by timer_period 
+=======
+        self.declare_parameter('laser_back', 180)
+>>>>>>> e060327 (laserturn finished)
 
         # definition of the QoS in order to receive data despite WiFi
         qos_policy = rclpy.qos.QoSProfile(reliability=rclpy.qos.ReliabilityPolicy.BEST_EFFORT,
@@ -36,11 +40,17 @@ class LaserTurn(rclpy.node.Node):
         self.front_distance = 2.0
         # create publisher for driving commands
         self.publisher_laserturn = self.create_publisher(Twist, 'laser', 1)
+<<<<<<< HEAD
         self.is_turning = False
         # create timer to periodically invoke the driving logic
         self.timer_period = 0.5  # seconds
         self.counter = 0
         self.turn_time = round(self.get_parameter('turn_time').get_parameter_value().integer_value / self.timer_period)
+=======
+
+        # create timer to periodically invoke the driving logic
+        self.timer_period = 0.5  # seconds
+>>>>>>> e060327 (laserturn finished)
         self.my_timer = self.create_timer(self.timer_period, self.timer_callback)
     
     # handling received laser scan data
@@ -49,6 +59,7 @@ class LaserTurn(rclpy.node.Node):
         # saving the required sensor value, no further processing at this point
         self.front_distance = msg.ranges[self.get_parameter('laser_front').get_parameter_value().integer_value]
         
+<<<<<<< HEAD
     # driving logics
     def timer_callback(self):
         #self.get_logger().info("TurnLogic")
@@ -84,6 +95,27 @@ class LaserTurn(rclpy.node.Node):
 
         # create message
         self.counter -= 1
+=======
+    # driving logic
+    def timer_callback(self):
+
+        turn_dist = self.get_parameter('distance_to_turn').get_parameter_value().double_value
+        turn_speed = self.get_parameter('speed_turn').get_parameter_value().double_value
+        drive_speed = self.get_parameter('speed_drive').get_parameter_value().double_value
+
+        #front_dist = self.front_distance
+        back_dist = self.back_distance
+
+        # no or far away obstacle
+        if(back_dist <= turn_dist):
+            turn = 0.0
+            speed= drive_speed
+        else:
+            turn = turn_speed
+            speed = 0.0
+
+        # create message
+>>>>>>> e060327 (laserturn finished)
         msg = Twist()
         msg.linear.x = speed
         msg.angular.z = turn
