@@ -27,3 +27,15 @@ Anschließend führt man folgende Befehle aus:
 
 Um sicherzustellen, dass das Package auf den Laserscaner zugreifen kann sollte vorher mittels "ros2 topic list" überprüft werden, ob das entsprechende Topic des Laserscaners existiert.
 
+## **Belegaufgabe 3 (Linefollow)**
+### **Funktionsweise**
+Hierbei sollte ein Package entwickelt werden welches mittels der Daten der Kamera des Roboters einer weißen Linie auf dem Boden zu folgen. Dazu wird zunächst das Bild auf dem Topic "/image_raw/compressed" ausliest und in ein schwarz-weiß Bild konvertiert. Anschließend wird auch nur die unterste Reihe an Pixeln in diesem Bild betrachtet und von diesem Array der hellste Wert (höchste Wert) betrachet. Danach wird überprüft, ob dieser unter dem Lightlim liegt, wenn befindet sich keine Linie in Sicht und der Roboter bleibt stehen und dreht sich im Kreis. Nun werden die 20 hellsten Einträge ausgewertet und ihr Median gebildet und dessen Index im originall Array festgestellt, falls dieser Index nun kleiner als der mittlere Index des Arrays ist muss sich der Roboter nach Links drehen. Im anderen Fall muss sich er nach Rechts drehen.
+
+### **Startanleitung**
+Zum ausführen öffnet man ein Terminal und navigiert in das Verzeichnis, welches die ros Packages enthält.
+Anschließend führt man folgende Befehle aus:
+- colcon build
+- source install/local_setup.bash
+- ros2 launch linebounce_launch.py
+
+
