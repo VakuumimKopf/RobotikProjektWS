@@ -1,13 +1,10 @@
-# **Robotik Projekt - Repository von Nikolas Laaser**
+# **Robotik - Oliver Lorenz**
 
 ## **Belegaufgabe 1 (Publisher Subscriber)**
 ### **Funktionsweise**
-Aufgabe war es zwei Packages zu erstellen, welche die jeweils die Aufgabe eines Publishers und eines Subscribers übernehmen sollen.
-Das Package cpp_pubsub enthält zwei ausführbare Dateien in cpp_pubsub/src, eine davon ist ein Publisher, die andere ein Subscriber für die Belegaufgabe ist jedoch nur der Publisher von nöten.
-Das andere Package ist timing_tubaf_py und enthält eine ausführbare Datei listener.py, welche hier als Subscriber funktioniert.
-Die beiden Packages bewirken wenn man sie korrekt mit ros2 buildet, dass publisher_member_function.cpp kontinuierlich "Hello World!" Nachrichten auf dem Topic "number"versendent
-und der listener.py hört den Kanal ab und gibt das Hello WOrld mit der jeweiligen Zahl wieder. ZUsätzlich erstellt listener.py ein weiteres Topic Namens "diff" und veröffentlicht dort
-die Zeitdifferenz zwischen den letzten beiden Nachrichten die durch "number" angekommen sind.
+Hierbei sollten zwei Packages erstellt werden. Dabei sollte eines Publisher (in C++) und eines Subscriber (in Python) sein.
+Der Publisher ist dabei im Package cpp_pubsub zu finden und der Subscriber im Package timing_tubaf_py.
+Beim ausführen beider Packages hat zur Folge, dass der Publisher auf einen bestimmten Topic "number" die ganze Zeit "Hello World!" überträgt, während der Subscriber auf diesem Topic diese Nachrichten empfängt und mit entsprechender Nummer wieder ausgibt. Zusätzlich published er auf dem Topic "diff" die Zeitdifferenz der letzten beiden Nachrichten auf "number" 
 
 ### **Abhängigkeiten**
 Um die Packages nutzen zu können, muss zuerst ROS2 Humble heruntergeladen werden und ein Workspace eingerichtet werden. 
