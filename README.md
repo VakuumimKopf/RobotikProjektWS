@@ -38,4 +38,16 @@ Anschließend führt man folgende Befehle aus:
 - source install/local_setup.bash
 - ros2 launch linebounce_launch.py
 
+## **Belegaufgabe 4 (Zwischen 2 Objekten auf einer Linie fahren)**
+### **Funktionsweise**
+Hierbei soll ein Package aus 3 Notes erstellt werden, welches dem Roboter ermöglicht einer weißen Linie zu folgen bis er auf ein Objekt trifft, an welchem er wendet um der selben Linie in die andere Richtung zu folgen bis er wieder auf ein Objekt trifft. Die Node laserturn verwaltet dabei die mittels des Laserscaners, ob der Roboter sich einem Objekt nähert und leitet dabei dann die Drehbewegung ein indem sie auf einem eigenen Topic "laser" eine Drehanweisung published. Ist die Drehung abgeschlossen published sie kein Drehbefehl mehr.
+Die andere Note linefollow funktioniert genauso wie das Package aus Aufgabe 3, nur das hier der Fahrbefehl nicht direkt an den Roboter geschickt wird, sondern mittels des eigenen Topic "line" published. 
+Die letzte Node die noch gebraucht wird ist der nodemaster dieser subscribed auf beiden Topics "laser" und "line" und erhält somit 2 verschiedene Fahranweisungen, wobei er entscheiden muss welchen er an den Roboter weiterleitet. Dies tut er indem er zwischen 3 Zuständen unterscheidet Follow, Turn und Error. Welcher Zustand gerade angenommen wird und somit welchen Fahrbefehl er weiterleitet, hängt von dem Fahrbefehl der Node laserturn ab. In ihr schaut er sich an, ob die Drehung auf Null ist oder nicht. Falls sie auf Null ist wechselt er in den Zustand follow und überträgt den Bewegungsbefehl aus dem Topic "line". Falls sie nicht Null ist wechselt er in den Zustand turn und überträgt den Fahrbefehl aus dem Topic "laser". 
+
+### **Startanleitung**
+Zum ausführen öffnet man ein Terminal und navigiert in das Verzeichnis, welches die ros Packages enthält.
+Anschließend führt man folgende Befehle aus:
+- colcon build
+- source install/local_setup.bash
+- ros2 launch two_drive two_drive_launch.py
 
