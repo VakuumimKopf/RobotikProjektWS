@@ -23,7 +23,7 @@ Zum ausführen öffnet man ein Terminal und navigiert in das Verzeichnis, welche
 Anschließend führt man folgende Befehle aus:
 - colcon build
 - source install/local_setup.bash
-- ros2 run
+- ros2 run laser_follow drive_with_laserscanner
 
 Um sicherzustellen, dass das Package auf den Laserscaner zugreifen kann sollte vorher mittels "ros2 topic list" überprüft werden, ob das entsprechende Topic des Laserscaners existiert.
 
