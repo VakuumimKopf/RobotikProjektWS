@@ -9,10 +9,12 @@ Beim ausführen beider Packages hat zur Folge, dass der Publisher auf einen best
 ### **Startanleitung**
 Zum ausführen öffnet man ein Terminal und navigiert in das Verzeichnis, welches die ros Packages enthält.
 Anschließend führt man folgende Befehle aus:
-- colcon build
-- source install/local_setup.bash
-- ros2 run cpp_pubsub talker
-- ros2 run timing_tubaf_py listener
+```
+colcon build
+source install/local_setup.bash
+ros2 run cpp_pubsub talker
+ros2 run timing_tubaf_py listener
+```
 
 ## **Belegaufgabe 2 (Laserfollow)**
 ### **Funktionsweise**
